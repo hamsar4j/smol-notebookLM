@@ -14,8 +14,7 @@ def get_PDF_text(file: str):
         raise ValueError(f"Error reading the PDF file: {str(e)}")
 
         # Check if the PDF has more than ~400,000 characters
-        # The context length limit of the model is 131,072 tokens and thus the text should be less
-        # than this limit
+        # The context length limit of the model is 131,072 tokens
         # Assumes that 1 token is approximately 4 characters
     if len(text) > 400000:
         raise ValueError(
@@ -23,5 +22,3 @@ def get_PDF_text(file: str):
         )
 
     return text
-
-    text = get_PDF_text("MoA.pdf")

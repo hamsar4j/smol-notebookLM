@@ -3,7 +3,7 @@ from typing import Literal, List
 
 
 class LineItem(BaseModel):
-    speaker: Literal["Host (Jane)", "Guest (John)"]
+    speaker: Literal["Host (Jane)", "Guest"]
     text: str
 
 
