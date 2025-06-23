@@ -5,7 +5,6 @@ from pathlib import Path
 def get_PDF_text(file: str):
     text = ""
 
-    # Read the PDF file and extract text
     try:
         with Path(file).open("rb") as f:
             reader = PdfReader(f)
@@ -13,9 +12,7 @@ def get_PDF_text(file: str):
     except Exception as e:
         raise ValueError(f"Error reading the PDF file: {str(e)}")
 
-        # Check if the PDF has more than ~400,000 characters
-        # The context length limit of the model is 131,072 tokens
-        # Assumes that 1 token is approximately 4 characters
+    # Assumes that 1 token is approximately 4 characters
     if len(text) > 400000:
         raise ValueError(
             "The PDF is too long. Please upload a PDF with fewer than ~131072 tokens."

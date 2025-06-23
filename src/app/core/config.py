@@ -11,5 +11,9 @@ class Settings(BaseSettings):
     llm_api_key: str = os.getenv("LLM_API_KEY", "")
     llm_model: str = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
 
+    # cartesia api
+    cartesia_api_key: str = os.getenv("CARTESIA_API_KEY", "")
+    cartesia_base_url: str = os.getenv("CARTESIA_BASE_URL", "")
+
 
 settings = Settings()
