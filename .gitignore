@@ -9,4 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
+# environment variables
 .env
+
+audio_output/
