@@ -9,10 +9,12 @@ wheels/
 # Virtual environments
 .venv
 
-# environment variables
+# Environment variables
 .env
 
+# Logs
 audio_output/
 full_podcast.wav
 
+# MacOS specific files
 .DS_Store
