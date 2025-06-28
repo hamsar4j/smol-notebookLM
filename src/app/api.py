@@ -5,6 +5,11 @@ from services.services import (
     save_script_to_json,
     create_and_concatenate_audio,
 )
+import logging
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI(title="SMOL NotebookLM API")
 
@@ -13,7 +18,7 @@ app = FastAPI(title="SMOL NotebookLM API")
 def generate_and_save_script(
     pdf_path: str,
     filename: str = "response.json",
-):
+) -> dict:
     """Generate a script from a PDF and save it to a JSON file."""
 
     if not pdf_path.endswith(".pdf"):
@@ -28,7 +33,7 @@ def generate_and_save_script(
 
 
 @app.get("/generate_audio")
-def generate_audio(filename: str):
+def generate_audio(filename: str) -> str:
     """Generate audio files from a script saved in a JSON file."""
     if not filename.endswith(".json"):
         raise ValueError("The provided filename must be a JSON file.")
@@ -41,3 +46,11 @@ def generate_audio(filename: str):
 
     output_filename = create_and_concatenate_audio(response["response"])
     return output_filename
+
+
+if __name__ == "__main__":
+    response_dict = generate_and_save_script(
+        pdf_path="MoA.pdf",
+        filename="response.json",
+    )
+    generate_audio(filename="response.json")

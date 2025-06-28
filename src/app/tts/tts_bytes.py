@@ -1,5 +1,4 @@
 import os
-import json
 import subprocess
 from cartesia import Cartesia
 from core.config import settings
@@ -12,20 +11,13 @@ host_id = "694f9389-aac1-45b6-b726-9d9369183238"
 guest_id = "a0e99841-438c-4a64-b679-ae501e7d6091"
 
 
-def generate_audio_from_script(json_file_path, output_dir="audio_output"):
+def generate_audio_from_script(script, output_dir="audio_output") -> list:
     """Generate audio files from the script in response.json"""
 
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Load the response JSON
-    with open(json_file_path, "r") as f:
-        data = json.load(f)
-
-    script = data["response"]["script"]
+    full_script = script["script"]
     audio_files = []
 
-    for i, line_item in enumerate(script):
+    for i, line_item in enumerate(full_script):
         speaker = line_item["speaker"]
         text = line_item["text"]
 
@@ -63,7 +55,7 @@ def generate_audio_from_script(json_file_path, output_dir="audio_output"):
     return audio_files
 
 
-def concatenate_audio_files(audio_files, output_file="full_podcast.wav"):
+def concatenate_audio_files(audio_files, output_file="full_podcast.wav") -> None:
     """Concatenate all audio files into one"""
     # Create a text file listing all audio files
     with open("file_list.txt", "w") as f:

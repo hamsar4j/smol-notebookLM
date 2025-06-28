@@ -2,7 +2,7 @@ from pypdf import PdfReader
 from pathlib import Path
 
 
-def get_PDF_text(file: str):
+def get_PDF_text(file: str) -> str:
     text = ""
 
     try:

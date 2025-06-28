@@ -13,7 +13,7 @@ def call_llm(system_prompt: str, text: str, dialogue_format) -> str:
             {"role": "user", "content": text},
         ],
         model=settings.llm_model,
-        max_tokens=200000,
+        max_tokens=500000,
         response_format={
             "type": "json_object",
             "schema": dialogue_format.model_json_schema(),

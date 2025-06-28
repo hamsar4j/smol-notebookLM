@@ -13,3 +13,5 @@ wheels/
 .env
 
 audio_output/
+
+.DS_Store
