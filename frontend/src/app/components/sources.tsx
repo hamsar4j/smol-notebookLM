@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { PlusOutlined, FileTextOutlined } from "@ant-design/icons";
+import { Card } from "antd";
 import { BACKEND_BASE_URL } from "../constants";
 import { SourcesProps } from "../types";
 
@@ -65,50 +66,62 @@ export default function Sources({
 
   return (
     // {/* Left Panel: Sources */}
-    <aside className="flex w-1/3 flex-col gap-4 border-r bg-white p-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Sources</h2>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          accept="application/pdf"
-          className="hidden"
-        />
-        <button
-          onClick={handleAddSourcesClick}
-          disabled={isLoading}
-          className="flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          <PlusOutlined size={16} />
-          {isLoading ? "Uploading..." : "Add Source"}
-        </button>
-      </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <div className="flex flex-col gap-3 overflow-y-auto">
-        {/* Source Item Card */}
-        {sources.map((source, index) => (
-          <div
-            key={index}
-            onClick={() => setSelectedSource(source)}
-            className={`cursor-pointer rounded-lg border p-4 ${
-              selectedSource?.name === source.name
-                ? "border-blue-500 bg-blue-50"
-                : "hover:bg-gray-50"
-            }`}
+    <aside className="flex w-1/3 flex-col p-6">
+      <Card
+        title="Sources"
+        variant="borderless"
+        className="flex flex-1 flex-col"
+      >
+        <div className="flex items-center justify-between p-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept="application/pdf"
+            className="hidden"
+          />
+          <button
+            onClick={handleAddSourcesClick}
+            disabled={isLoading}
+            className="flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-white hover:opacity-70"
           >
-            <div className="flex items-center gap-3">
-              <FileTextOutlined className="text-blue-500" />
-              <div className="flex-1">
-                <h3 className="font-semibold">{source.name}</h3>
-                <p className="text-sm text-gray-500">
-                  {Math.round(source.size / 1024)} KB
-                </p>
+            <PlusOutlined />
+            {isLoading ? "Uploading..." : "Add Source"}
+          </button>
+        </div>
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <div className="flex-1 space-y-2 overflow-y-auto p-2">
+          {/* Source Item Card */}
+          {sources.length > 0 ? (
+            sources.map((source, index) => (
+              <div
+                key={index}
+                onClick={() => setSelectedSource(source)}
+                className={`cursor-pointer rounded-lg border bg-gray-100 p-4 shadow-md${
+                  selectedSource?.name === source.name
+                    ? "border border-blue-500"
+                    : "border-gray-100 hover:opacity-70"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <FileTextOutlined />
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{source.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      {Math.round(source.size / 1024)} KB
+                    </p>
+                  </div>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="py-10 text-center text-gray-500">
+              <p>No sources added yet.</p>
+              <p className="text-sm">Click "Add Source" to upload a PDF.</p>
             </div>
-          </div>
-        ))}
-      </div>
+          )}
+        </div>
+      </Card>
     </aside>
   );
 }
