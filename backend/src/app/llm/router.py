@@ -1,5 +1,5 @@
 from together import Together
-from core.config import settings
+from app.core.config import settings
 
 # client = OpenAI(base_url=settings.llm_base_url, api_key=settings.llm_api_key)
 client = Together(api_key=settings.llm_api_key)

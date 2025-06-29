@@ -1,7 +1,7 @@
 import os
 import subprocess
 from cartesia import Cartesia
-from core.config import settings
+from app.core.config import settings
 
 client = Cartesia(
     api_key=settings.cartesia_api_key,

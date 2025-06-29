@@ -1,9 +1,9 @@
-from llm.router import call_llm
+from app.llm.router import call_llm
 from pydantic import ValidationError
-from utils.get_text import get_PDF_text
-from models.models import Transcript
-from tts.tts_bytes import generate_audio_from_script, concatenate_audio_files
-from llm.prompts import SYSTEM_PROMPT
+from app.utils.get_text import get_PDF_text
+from app.models.models import Transcript
+from app.tts.tts_bytes import generate_audio_from_script, concatenate_audio_files
+from app.llm.prompts import SYSTEM_PROMPT
 import json
 import logging
 
