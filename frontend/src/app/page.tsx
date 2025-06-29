@@ -1,8 +1,15 @@
+"use client";
+
 import Sources from "./components/sources";
 import Notepad from "./components/notepad";
 import Player from "./components/player";
+import { useState } from "react";
+import { Source } from "./types";
 
 export default function Home() {
+  const [sources, setSources] = useState<Source[]>([]);
+  const [selectedSource, setSelectedSource] = useState<Source | null>(null);
+
   return (
     <div className="flex h-screen flex-col bg-gray-50 font-sans text-gray-900">
       {/* Header */}
@@ -16,11 +23,16 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel: Sources */}
-        <Sources />
+        <Sources
+          sources={sources}
+          setSources={setSources}
+          selectedSource={selectedSource}
+          setSelectedSource={setSelectedSource}
+        />
         {/* Middle Panel: Notepad */}
         <Notepad />
         {/* Right Panel: Podcast Player */}
-        <Player />
+        <Player selectedSource={selectedSource} />
       </div>
     </div>
   );

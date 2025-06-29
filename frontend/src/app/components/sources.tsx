@@ -3,10 +3,14 @@
 import { useState, useRef } from "react";
 import { PlusOutlined, FileTextOutlined } from "@ant-design/icons";
 import { BACKEND_BASE_URL } from "../constants";
-import { Source } from "../types";
+import { SourcesProps } from "../types";
 
-export default function Sources() {
-  const [sources, setSources] = useState<Source[]>([]);
+export default function Sources({
+  sources,
+  setSources,
+  selectedSource,
+  setSelectedSource,
+}: SourcesProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -86,15 +90,19 @@ export default function Sources() {
         {sources.map((source, index) => (
           <div
             key={index}
-            className="hover:bg-gray-80 cursor-pointer rounded-lg border p-4"
+            onClick={() => setSelectedSource(source)}
+            className={`cursor-pointer rounded-lg border p-4 ${
+              selectedSource?.name === source.name
+                ? "border-blue-500 bg-blue-50"
+                : "hover:bg-gray-50"
+            }`}
           >
             <div className="flex items-center gap-3">
               <FileTextOutlined className="text-blue-500" />
               <div className="flex-1">
                 <h3 className="font-semibold">{source.name}</h3>
-                <p className="text-sm text-gray-500">{source.type}</p>
                 <p className="text-sm text-gray-500">
-                  {source.size > 0 ? `${source.size} bytes` : "Processing..."}
+                  {Math.round(source.size / 1024)} KB
                 </p>
               </div>
             </div>
