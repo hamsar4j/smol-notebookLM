@@ -16,11 +16,16 @@ def upload_pdf(file: UploadFile = File(...)) -> dict:
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="The uploaded file must be a PDF.")
 
+    if file.size is None:
+        raise HTTPException(status_code=400, detail="Could not determine file size.")
+
     if file.size > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="File too large")
 
-    filename = file.filename
-    file_location = os.path.join(PDF_DIR, filename)
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No filename provided.")
+
+    file_location = os.path.join(PDF_DIR, file.filename)
 
     try:
         with open(file_location, "wb") as f:
@@ -48,7 +53,7 @@ def generate_audio(request: dict) -> FileResponse:
 
     script_obj = create_script_from_pdf(pdf_path)
     script_dict = script_obj.model_dump()
-    output_filename = build_audio_from_script(script_dict, output_filename=None)
+    output_filename = build_audio_from_script(script_dict)
 
     if not os.path.exists(output_filename):
         raise HTTPException(status_code=500, detail="Audio file could not be created.")
