@@ -5,7 +5,9 @@ from app.services.services import (
     create_script_from_pdf,
     build_audio_from_script,
 )
-from app.core.constants import PDF_DIR, MAX_FILE_SIZE
+from app.core.constants import PDF_DIR, MAX_FILE_SIZE, AUDIO_DIR
+from app.models.models import AudioRequest
+from werkzeug.utils import secure_filename
 
 router = APIRouter()
 
@@ -25,7 +27,8 @@ def upload_pdf(file: UploadFile = File(...)) -> dict:
     if not file.filename:
         raise HTTPException(status_code=400, detail="No filename provided.")
 
-    file_location = os.path.join(PDF_DIR, file.filename)
+    safe_filename = secure_filename(file.filename)
+    file_location = os.path.join(PDF_DIR, safe_filename)
 
     try:
         with open(file_location, "wb") as f:
@@ -37,9 +40,9 @@ def upload_pdf(file: UploadFile = File(...)) -> dict:
 
 
 @router.post("/generate-audio")
-def generate_audio(request: dict) -> FileResponse:
+def generate_audio(request: AudioRequest) -> FileResponse:
     """Generate audio files from a script saved in a JSON file."""
-    pdf_name = request.get("filename")
+    pdf_name = secure_filename(request.filename)
 
     if not pdf_name:
         raise HTTPException(status_code=400, detail="Filename not provided.")
@@ -73,9 +76,10 @@ def get_audio(filename: str) -> FileResponse:
             status_code=400, detail="The provided filename must be a WAV file."
         )
 
-    if not os.path.exists(filename):
+    file_name = secure_filename(os.path.basename(filename))
+    file_path = os.path.join(AUDIO_DIR, file_name)
+
+    if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Audio file not found.")
 
-    return FileResponse(
-        filename, media_type="audio/wav", filename=os.path.basename(filename)
-    )
+    return FileResponse(file_path, media_type="audio/wav", filename=file_name)

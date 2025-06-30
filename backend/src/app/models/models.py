@@ -11,3 +11,7 @@ class Transcript(BaseModel):
     scratchpad: str
     name_of_guest: str
     script: List[LineItem]
+
+
+class AudioRequest(BaseModel):
+    filename: str
