@@ -11,7 +11,7 @@ host_id = "694f9389-aac1-45b6-b726-9d9369183238"
 guest_id = "a0e99841-438c-4a64-b679-ae501e7d6091"
 
 
-def generate_audio_from_script(script, output_dir="audio_output") -> list:
+def generate_audio_from_script(script: dict, output_dir: str) -> list:
     """Generate audio files from the script in response.json"""
 
     os.makedirs(output_dir, exist_ok=True)
@@ -57,9 +57,7 @@ def generate_audio_from_script(script, output_dir="audio_output") -> list:
     return audio_files
 
 
-def concatenate_audio_files(
-    audio_files, output_file="audio_output/full_podcast.wav"
-) -> None:
+def concatenate_audio_files(audio_files, output_file: str) -> None:
     """Concatenate all audio files into one"""
     # Create a text file listing all audio files
     with open("file_list.txt", "w") as f:

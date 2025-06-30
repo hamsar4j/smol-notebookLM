@@ -1,13 +1,7 @@
-import json
-import os
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from app.services.services import (
-    create_script_from_pdf,
-    save_script_to_json,
-    create_and_concatenate_audio,
-)
+from app.api.routes import router
+from app.core.constants import ALLOWED_ORIGINS
 import logging
 
 logging.basicConfig(
@@ -16,98 +10,18 @@ logging.basicConfig(
 
 app = FastAPI(title="SMOL NotebookLM API")
 
-origins = [
-    "http://localhost:3000",  # The default port for Next.js
-    "http://127.0.0.1:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-STORAGE_DIR = "storage"
-PDF_DIR = os.path.join(STORAGE_DIR, "pdfs")
-os.makedirs(PDF_DIR, exist_ok=True)
-
-@app.post("/upload-pdf")
-def upload_pdf(file: UploadFile = File(...)) -> dict:
-    """Upload a PDF file and save it to the server."""
-    if file.content_type != "application/pdf":
-        raise HTTPException(status_code=400, detail="The uploaded file must be a PDF.")
-
-    filename = file.filename
-    file_location = os.path.join(PDF_DIR, filename)
-
-    try:
-        with open(file_location, "wb") as f:
-            f.write(file.file.read())
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not save file: {e}")
-
-    return {"filename": file_location}
-
-# @app.post("/generate-script")
-# def generate_script(
-#     pdf_path: str,
-#     filename: str = "response.json",
-# ) -> dict:
-#     """Generate a script from a PDF and save it to a JSON file."""
-#     if not os.path.exists(pdf_path):
-#         raise HTTPException(status_code=404, detail="PDF file not found.")
-
-#     script_obj = create_script_from_pdf(pdf_path)
-#     save_script_to_json(script_obj, filename)
-
-#     response_dict = {"response": script_obj.model_dump()}
-
-#     return response_dict
+app.include_router(router)
 
 
-@app.post("/generate-audio")
-def generate_audio(request: dict) -> str:
-    """Generate audio files from a script saved in a JSON file."""
-    pdf_name = request.get("filename")
-
-    if not pdf_name:
-        raise HTTPException(status_code=400, detail="Filename not provided.")
-    
-    pdf_path = os.path.join(PDF_DIR, os.path.basename(pdf_name))
-
-    if not os.path.exists(pdf_path):
-        raise HTTPException(status_code=404, detail=f"PDF file not found at: {pdf_path}")
-
-    script_obj = create_script_from_pdf(pdf_path)
-    script_dict = script_obj.model_dump()
-    output_filename = create_and_concatenate_audio(script_dict)
-
-    if not os.path.exists(output_filename):
-        raise HTTPException(status_code=500, detail="Audio file could not be created.")
-
-    return FileResponse(output_filename, media_type="audio/wav", filename=os.path.basename(output_filename))
-
-# @app.get("/get-script")
-# def get_script(filename: str) -> FileResponse:
-#     """Retrieve the script from a JSON file."""
-#     if not filename.endswith(".json"):
-#         raise HTTPException(status_code=400, detail="The provided filename must be a JSON file.")
-    
-#     if not os.path.exists(filename):
-#         raise HTTPException(status_code=404, detail="JSON file not found.")
-    
-#     return FileResponse(filename, media_type="application/json", filename=os.path.basename(filename))
-
-@app.get("/get-audio")
-def get_audio(filename: str) -> FileResponse:
-    """Retrieve the audio file generated from the script."""
-    if not filename.endswith(".wav"):
-        raise HTTPException(status_code=400, detail="The provided filename must be a WAV file.")
-
-    if not os.path.exists(filename):
-        raise HTTPException(status_code=404, detail="Audio file not found.")
-
-    return FileResponse(filename, media_type="audio/wav", filename=os.path.basename(filename))
+@app.get("/health")
+def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy"}
