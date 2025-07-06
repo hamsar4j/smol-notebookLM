@@ -30,7 +30,7 @@ export default function Home() {
           setSelectedSource={setSelectedSource}
         />
         {/* Middle Panel: Notepad */}
-        <Notepad />
+        <Notepad selectedPdf={selectedSource?.name} />
         {/* Right Panel: Podcast Player */}
         <Player selectedSource={selectedSource} />
       </div>

@@ -78,11 +78,8 @@ def chat_with_pdf_content(pdf_filename: str, user_message: str) -> ChatResponse:
     # Create context-aware prompt
     context_prompt = f"""
     You are a helpful AI assistant. The user has uploaded a PDF document and wants to chat about its contents. 
-    
     Here is the content of the PDF:
-    
     {pdf_text}
-    
     Please answer the user's question based on the PDF content. If the question cannot be answered from the PDF content, 
     let the user know and provide general guidance if possible.
     """

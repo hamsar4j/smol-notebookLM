@@ -14,3 +14,23 @@ export interface SourcesProps {
 export interface PlayerProps {
   selectedSource: Source | null;
 }
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
+export interface ChatRequest {
+  filename: string;
+  message: string;
+}
+
+export interface ChatResponse {
+  response: string;
+}
+
+export interface NotepadProps {
+  selectedPdf?: string;
+}

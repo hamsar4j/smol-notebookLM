@@ -20,7 +20,6 @@ class AudioRequest(BaseModel):
 class ChatRequest(BaseModel):
     filename: str
     message: str
-    # context: str
 
 
 class ChatResponse(BaseModel):
