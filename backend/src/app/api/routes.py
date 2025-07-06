@@ -4,9 +4,11 @@ from fastapi.responses import FileResponse
 from app.services.services import (
     create_script_from_pdf,
     build_audio_from_script,
+    chat_with_pdf_content,
+    save_pdf_text,
 )
 from app.core.constants import PDF_DIR, MAX_FILE_SIZE, AUDIO_DIR
-from app.models.models import AudioRequest
+from app.models.models import AudioRequest, ChatRequest, ChatResponse
 from werkzeug.utils import secure_filename
 
 router = APIRouter()
@@ -33,6 +35,8 @@ def upload_pdf(file: UploadFile = File(...)) -> dict:
     try:
         with open(file_location, "wb") as f:
             f.write(file.file.read())
+
+        save_pdf_text(file_location, safe_filename)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not save file: {e}")
 
@@ -83,3 +87,29 @@ def get_audio(filename: str) -> FileResponse:
         raise HTTPException(status_code=404, detail="Audio file not found.")
 
     return FileResponse(file_path, media_type="audio/wav", filename=file_name)
+
+
+@router.post("/chat")
+def chat_with_pdf(request: ChatRequest) -> ChatResponse:
+    """Chat with the LLM using stored PDF content as context."""
+    if not request.filename or not request.message:
+        raise HTTPException(
+            status_code=400, detail="Filename and message are required."
+        )
+
+    safe_filename = secure_filename(request.filename)
+    if not safe_filename:
+        raise HTTPException(status_code=400, detail="Invalid filename.")
+
+    try:
+        chat_response = chat_with_pdf_content(safe_filename, request.message)
+        return chat_response
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="PDF text content not found. Please upload the PDF first.",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error processing chat request: {e}"
+        )

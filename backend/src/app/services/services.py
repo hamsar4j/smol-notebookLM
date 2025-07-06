@@ -1,7 +1,7 @@
 from app.llm.router import call_llm
 from pydantic import ValidationError
-from app.utils.get_text import get_PDF_text
-from app.models.models import Transcript
+from app.utils.get_text import load_pdf_text, save_pdf_text
+from app.models.models import Transcript, ChatResponse
 from app.tts.tts_bytes import generate_audio_from_script, concatenate_audio_files
 from app.llm.prompts import SYSTEM_PROMPT
 from app.core.constants import AUDIO_DIR
@@ -19,8 +19,11 @@ def create_script_from_pdf(
     if not Path(pdf_path).exists():
         raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
-    text = get_PDF_text(pdf_path)
-    logger.info(f"Extracted text from PDF: {len(text)} characters")
+    pdf_filename = os.path.basename(pdf_path)
+    save_pdf_text(pdf_path, pdf_filename)
+
+    text = load_pdf_text(pdf_filename)
+    logger.info(f"Using PDF text: {len(text)} characters")
 
     if not text.strip():
         raise ValueError("No text extracted from PDF")
@@ -58,3 +61,32 @@ def build_audio_from_script(script: dict) -> str:
     audio_files = generate_audio_from_script(script, output_dir=AUDIO_DIR)
     concatenate_audio_files(audio_files, output_filename)
     return output_filename
+
+
+def chat_with_pdf_content(pdf_filename: str, user_message: str) -> ChatResponse:
+    """Chat with LLM using stored PDF content as context."""
+    try:
+        # Load the extracted text from storage
+        pdf_text = load_pdf_text(pdf_filename)
+        logger.info(f"Using stored PDF text for chat: {len(pdf_text)} characters")
+    except FileNotFoundError:
+        raise FileNotFoundError(f"No extracted text found for PDF: {pdf_filename}")
+
+    if not pdf_text.strip():
+        raise ValueError("No text content available for this PDF")
+
+    # Create context-aware prompt
+    context_prompt = f"""
+    You are a helpful AI assistant. The user has uploaded a PDF document and wants to chat about its contents. 
+    
+    Here is the content of the PDF:
+    
+    {pdf_text}
+    
+    Please answer the user's question based on the PDF content. If the question cannot be answered from the PDF content, 
+    let the user know and provide general guidance if possible.
+    """
+
+    response = call_llm(context_prompt, user_message)
+
+    return ChatResponse(response=response)

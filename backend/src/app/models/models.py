@@ -15,3 +15,13 @@ class Transcript(BaseModel):
 
 class AudioRequest(BaseModel):
     filename: str
+
+
+class ChatRequest(BaseModel):
+    filename: str
+    message: str
+    # context: str
+
+
+class ChatResponse(BaseModel):
+    response: str
