@@ -1,6 +1,7 @@
 from pypdf import PdfReader
 from pathlib import Path
 from app.core.constants import TEXT_DIR
+from datetime import datetime
 import logging
 import os
 import json
@@ -31,7 +32,7 @@ def save_pdf_text(pdf_path: str, pdf_filename: str) -> str:
             "pdf_filename": pdf_filename,
             "pdf_path": pdf_path,
             "extracted_text": extracted_text,
-            "extraction_date": str(Path(pdf_path).stat().st_mtime),
+            "extraction_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
         with open(text_path, "w", encoding="utf-8") as f:
